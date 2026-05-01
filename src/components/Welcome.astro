@@ -1,0 +1,525 @@
+---
+import breadIcon from "../assets/bread.svg";
+import bayleeAvatar from "../assets/baylee.webp";
+import breaderAvatar from "../assets/breader.webp";
+import jacobAvatar from "../assets/jacob.webp";
+import breadStats from "../data/bread-stats.json";
+
+const statRows: Array<{
+    emoji: string;
+    label: string;
+    key: keyof typeof breadStats.counts;
+}> = [
+    { emoji: "🍞", label: "bakeries", key: "bakery" },
+    { emoji: "🥐", label: "pastry shops", key: "pastry" },
+    { emoji: "🥯", label: "bagel shops", key: "bagel" },
+    { emoji: "🍩", label: "doughnut shops", key: "doughnut" },
+    { emoji: "🥪", label: "sandwich shops", key: "sandwich" },
+    { emoji: "☕", label: "cafés", key: "cafe" },
+    { emoji: "🛒", label: "supermarkets", key: "supermarket" },
+    { emoji: "🧺", label: "grocery stores", key: "grocery" },
+    { emoji: "🏪", label: "convenience stores", key: "convenience" },
+];
+
+const testimonials = [
+    {
+        avatar: bayleeAvatar,
+        name: "Baylee Yeasterday",
+        quote: "I absolutely love BreadNear.me. It helps me make my tummy ache, faster.",
+    },
+    {
+        avatar: breaderAvatar,
+        name: "Breader Christensen",
+        quote: "BreadNear.me is just ok. I’ve found more success the old-fashioned way: seeking out Italian grandmothers. When you locate the source, one that’s always made with love, the bread finds you.",
+    },
+    {
+        avatar: jacobAvatar,
+        name: "Jacob Roll",
+        quote: "This website ruined my life.",
+    },
+];
+---
+
+<main>
+    <section id="hero">
+        <div class="loaf-wrap">
+            <img
+                class="loaf"
+                src={breadIcon.src}
+                width="192"
+                height="192"
+                alt=""
+            />
+            <div class="sticker" aria-label="Now with more bread!">
+                <span>Now with<br /><strong>MORE BREAD!</strong></span>
+            </div>
+        </div>
+        <h1>BreadNear<span class="dot">.</span>me</h1>
+        <p class="tagline">
+            Finding you the bread you need, in your time of need.<br />
+            Enter your location below for immediate bread.
+        </p>
+        <form id="search" role="search">
+            <input
+                id="search-input"
+                type="search"
+                name="q"
+                placeholder="Find bread fast..."
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                required
+            />
+            <button type="submit" aria-label="Search">🔍</button>
+        </form>
+        <p class="search-status" id="search-status"></p>
+        <p class="alt-action">
+            <span>or</span>
+            <a href="/map/" class="explore-link">explore the map →</a>
+        </p>
+    </section>
+
+    <section id="breadcount">
+        <h2>All the bread you knead</h2>
+        <ul class="stats-list">
+            {
+                statRows.map((row) => (
+                    <li class="stat-card">
+                        <span class="stat-emoji" aria-hidden="true">
+                            {row.emoji}
+                        </span>
+                        <span class="stat-count">
+                            {breadStats.counts[row.key].toLocaleString()}
+                        </span>
+                        <span class="stat-label">{row.label}</span>
+                    </li>
+                ))
+            }
+        </ul>
+        <p class="stats-tagline">
+            With global reach, we can find you bread no matter where you are.
+        </p>
+    </section>
+
+    <section id="testimonials">
+        <h2>User testimonials</h2>
+        <ul class="testimonial-list">
+            {
+                testimonials.map((t) => (
+                    <li class="testimonial-card">
+                        <img
+                            class="avatar"
+                            src={t.avatar.src}
+                            width={t.avatar.width}
+                            height={t.avatar.height}
+                            alt=""
+                        />
+                        <div class="testimonial-body">
+                            <blockquote>“{t.quote}”</blockquote>
+                            <p class="attribution">
+                                <strong>{t.name}</strong>
+                                <span class="title">{t.title}</span>
+                            </p>
+                        </div>
+                    </li>
+                ))
+            }
+        </ul>
+    </section>
+</main>
+
+<style>
+    main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 48px 24px 96px;
+    }
+
+    #hero {
+        text-align: center;
+        padding: 32px 0 48px;
+        position: relative;
+    }
+
+    .sticker {
+        position: absolute;
+        top: -18px;
+        right: -56px;
+        width: 110px;
+        height: 110px;
+        display: grid;
+        place-items: center;
+        background: #ffd23f;
+        color: #3a2410;
+        text-align: center;
+        font-size: 13px;
+        line-height: 1.15;
+        padding: 10px;
+        box-sizing: border-box;
+        transform: rotate(14deg);
+        clip-path: polygon(
+            50% 0%,
+            60% 12%,
+            75% 5%,
+            78% 22%,
+            95% 22%,
+            88% 38%,
+            100% 50%,
+            88% 62%,
+            95% 78%,
+            78% 78%,
+            75% 95%,
+            60% 88%,
+            50% 100%,
+            40% 88%,
+            25% 95%,
+            22% 78%,
+            5% 78%,
+            12% 62%,
+            0% 50%,
+            12% 38%,
+            5% 22%,
+            22% 22%,
+            25% 5%,
+            40% 12%
+        );
+        filter: drop-shadow(3px 4px 0 #3a2410);
+        pointer-events: none;
+        user-select: none;
+    }
+
+    .sticker strong {
+        font-size: 15px;
+        display: inline-block;
+        margin-top: 2px;
+    }
+
+    @media (max-width: 600px) {
+        .sticker {
+            width: 88px;
+            height: 88px;
+            font-size: 11px;
+            top: -14px;
+            right: -38px;
+        }
+        .sticker strong {
+            font-size: 12px;
+        }
+    }
+
+    .loaf-wrap {
+        position: relative;
+        display: inline-block;
+        animation: wobble 3s ease-in-out infinite;
+        transform-origin: 50% 80%;
+    }
+
+    .loaf {
+        display: block;
+        width: 192px;
+        height: 192px;
+    }
+
+    @keyframes wobble {
+        0%,
+        100% {
+            transform: rotate(-4deg);
+        }
+        50% {
+            transform: rotate(4deg);
+        }
+    }
+
+    h1 {
+        font-size: 56px;
+        margin: 16px 0 8px;
+        letter-spacing: -0.02em;
+    }
+
+    .dot {
+        color: #c9622a;
+    }
+
+    .tagline {
+        font-size: 20px;
+        font-style: italic;
+        margin: 0 0 32px;
+        color: #6b4423;
+    }
+
+    #search {
+        display: flex;
+        align-items: stretch;
+        max-width: 480px;
+        margin: 0 auto;
+        background: #fff8e7;
+        border: 3px solid #3a2410;
+        border-radius: 999px;
+        box-shadow: 4px 4px 0 #3a2410;
+        overflow: hidden;
+        transition:
+            transform 0.1s,
+            box-shadow 0.1s;
+    }
+
+    #search:focus-within {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0 #3a2410;
+    }
+
+    #search-input {
+        font: inherit;
+        font-size: 20px;
+        flex: 1;
+        min-width: 0;
+        padding: 16px 8px 16px 24px;
+        background: transparent;
+        color: #3a2410;
+        border: none;
+        outline: none;
+    }
+
+    #search-input::placeholder {
+        color: #b08a5a;
+        font-style: italic;
+    }
+
+    #search button {
+        font: inherit;
+        font-size: 22px;
+        padding: 0 22px;
+        background: #c9622a;
+        color: #fff8e7;
+        border: none;
+        border-left: 3px solid #3a2410;
+        cursor: pointer;
+    }
+
+    #search button:hover {
+        background: #b3551f;
+    }
+
+    #search button:active {
+        background: #a0491a;
+    }
+
+    .search-status {
+        margin: 16px 0 0;
+        text-align: center;
+        font-size: 14px;
+        font-style: italic;
+        color: #6b4423;
+    }
+
+    .search-status:empty {
+        display: none;
+    }
+
+    .alt-action {
+        margin: 16px 0 0;
+        font-size: 15px;
+        color: #6b4423;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .alt-action span {
+        font-style: italic;
+        opacity: 0.7;
+    }
+
+    .explore-link {
+        color: #3a2410;
+        font-weight: bold;
+        text-decoration: underline;
+        text-decoration-color: #c9622a;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 4px;
+    }
+
+    .explore-link:hover {
+        color: #c9622a;
+    }
+
+    .fineprint {
+        font-size: 13px;
+        color: #8a6840;
+        margin-top: 16px;
+    }
+
+    #breadcount h2,
+    #testimonials h2 {
+        font-size: 28px;
+        border-bottom: 2px dashed #c9622a;
+        padding-bottom: 8px;
+    }
+
+    #breadcount {
+        margin-bottom: 48px;
+    }
+
+    .stats-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 20px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+
+    .stat-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 4px;
+        padding: 16px 8px;
+        background: #fff8e7;
+        border: 2px solid #3a2410;
+        border-radius: 12px;
+    }
+
+    .stat-emoji {
+        font-size: 32px;
+        line-height: 1;
+    }
+
+    .stat-count {
+        font-size: 22px;
+        font-weight: bold;
+        color: #c9622a;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: #6b4423;
+    }
+
+    .stats-tagline {
+        margin: 0;
+        text-align: center;
+        font-style: italic;
+        color: #6b4423;
+    }
+
+    @media (max-width: 600px) {
+        .stats-list {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .testimonial-list {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        gap: 16px;
+    }
+
+    .testimonial-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 20px;
+        background: #fff8e7;
+        border: 2px solid #3a2410;
+        border-radius: 12px;
+    }
+
+    .avatar {
+        flex-shrink: 0;
+        width: 56px;
+        height: 56px;
+        border: 2px solid #3a2410;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #ffd23f;
+    }
+
+    .testimonial-body {
+        flex: 1;
+    }
+
+    blockquote {
+        margin: 0 0 8px;
+        font-size: 16px;
+        font-style: italic;
+        color: #3a2410;
+        line-height: 1.4;
+    }
+
+    .attribution {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .attribution strong {
+        font-size: 15px;
+    }
+
+    .title {
+        margin-left: 8px;
+        color: #6b4423;
+        font-style: italic;
+    }
+
+    footer {
+        text-align: center;
+        margin-top: 48px;
+        font-size: 13px;
+        color: #8a6840;
+    }
+</style>
+
+<script>
+    // Browsers strip the User-Agent header from fetch (it's a "forbidden header"),
+    // so Nominatim identifies us by Referer (https://breadnear.me) per their usage
+    // policy. We pass the UA anyway as documented intent — and it sticks if anyone
+    // ever proxies this through a server.
+    const USER_AGENT =
+        "BreadNear.me-app/0.1 (+https://breadnear.me; bread location search; contact via https://breadnear.me)";
+
+    const form = document.getElementById("search") as HTMLFormElement | null;
+    const input = document.getElementById(
+        "search-input",
+    ) as HTMLInputElement | null;
+    const status = document.getElementById("search-status");
+    const setStatus = (msg: string) => {
+        if (status) status.textContent = msg;
+    };
+
+    form?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const q = input?.value.trim();
+        if (!q) return;
+        setStatus("🔍 Sniffing for that location...");
+        try {
+            const url = new URL("https://nominatim.openstreetmap.org/search");
+            url.searchParams.set("q", q);
+            url.searchParams.set("format", "json");
+            url.searchParams.set("limit", "1");
+            const res = await fetch(url, {
+                headers: {
+                    Accept: "application/json",
+                    "User-Agent": USER_AGENT,
+                },
+            });
+            if (!res.ok) throw new Error(`Nominatim ${res.status}`);
+            const hits = (await res.json()) as Array<{
+                lat: string;
+                lon: string;
+            }>;
+            if (!hits.length) {
+                setStatus("🥖 No bread found there. Try elsewhere?");
+                return;
+            }
+            const { lat, lon } = hits[0];
+            window.location.href = `/map/#12/${parseFloat(lat).toFixed(4)}/${parseFloat(lon).toFixed(4)}`;
+        } catch (err) {
+            console.error(err);
+            setStatus("💥 Bread radar offline. Try again?");
+        }
+    });
+</script>

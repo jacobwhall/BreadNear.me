@@ -1,0 +1,21 @@
+{
+  "name": "",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "fetch-bread": "bun scripts/fetch-bread.ts",
+    "tile-bread": "bun scripts/prepare-tiles.ts && tippecanoe -o public/bread.pmtiles --layer=bread --maximum-zoom=14 --drop-densest-as-needed --extend-zooms-if-still-dropping --maximum-tile-bytes=250000 --read-parallel --force public/bread.ndjson"
+  },
+  "dependencies": {
+    "astro": "^6.2.1",
+    "maplibre-gl": "^5.24.0",
+    "pmtiles": "^4.4.1"
+  }
+}

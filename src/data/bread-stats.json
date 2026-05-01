@@ -1,0 +1,16 @@
+{
+  "total": 2258282,
+  "counts": {
+    "bakery": 255315,
+    "pastry": 34296,
+    "bagel": 2250,
+    "doughnut": 5716,
+    "sandwich": 26389,
+    "cafe": 623974,
+    "convenience": 816834,
+    "grocery": 6976,
+    "supermarket": 486524,
+    "other": 8
+  },
+  "generatedAt": "2026-05-01T21:46:43.953Z"
+}

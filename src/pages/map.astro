@@ -1,0 +1,259 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+	<div id="page">
+		<header id="bread-header">
+			<a href="/" class="brand">
+				<span class="loaf" aria-hidden="true">🍞</span>
+				<span class="wordmark">BreadNear<span class="dot">.</span>me</span>
+			</a>
+			<p class="subtitle">A map of bread.</p>
+		</header>
+		<div id="map"></div>
+	</div>
+</Layout>
+
+<style>
+	#page {
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
+		width: 100%;
+	}
+
+	#bread-header {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		padding: 10px 20px;
+		background: #c9622a;
+		color: #fff8e7;
+		border-bottom: 3px solid #3a2410;
+		flex-shrink: 0;
+	}
+
+	.brand {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.loaf {
+		font-size: 28px;
+		line-height: 1;
+	}
+
+	.wordmark {
+		font-size: 22px;
+		font-weight: bold;
+		letter-spacing: -0.01em;
+	}
+
+	.dot {
+		color: #3a2410;
+	}
+
+	.subtitle {
+		margin: 0;
+		font-size: 14px;
+		font-style: italic;
+		opacity: 0.9;
+	}
+
+	#map {
+		flex: 1;
+		width: 100%;
+	}
+
+	@media (max-width: 600px) {
+		.subtitle {
+			display: none;
+		}
+	}
+</style>
+
+<script>
+	import maplibregl from 'maplibre-gl';
+	import 'maplibre-gl/dist/maplibre-gl.css';
+	import { Protocol } from 'pmtiles';
+	import breadIcon from '../assets/bread.svg';
+	import cartIcon from '../assets/cart.svg';
+	import basketIcon from '../assets/basket.svg';
+	import convenienceIcon from '../assets/convenience.svg';
+	import coffeeIcon from '../assets/coffee.svg';
+	import croissantIcon from '../assets/croissant.svg';
+	import sandwichIcon from '../assets/sandwich.svg';
+	import bagelIcon from '../assets/bagel.svg';
+	import doughnutIcon from '../assets/doughnut.svg';
+
+	const PROTOMAPS_KEY = 'a225972fbf33c056';
+	const BREAD_PMTILES = 'https://cdn.breadnear.me/bread.pmtiles';
+
+	// Namespaced so our ids can't collide with basemap sprite icons (the protomaps
+	// light sprite includes 'coffee', 'convenience_store', etc, and addImage
+	// silently no-ops on duplicate ids).
+	const ICON_PREFIX = 'bn:';
+	const ICONS = {
+		[`${ICON_PREFIX}bread`]: breadIcon,
+		[`${ICON_PREFIX}cart`]: cartIcon,
+		[`${ICON_PREFIX}basket`]: basketIcon,
+		[`${ICON_PREFIX}convenience`]: convenienceIcon,
+		[`${ICON_PREFIX}coffee`]: coffeeIcon,
+		[`${ICON_PREFIX}croissant`]: croissantIcon,
+		[`${ICON_PREFIX}sandwich`]: sandwichIcon,
+		[`${ICON_PREFIX}bagel`]: bagelIcon,
+		[`${ICON_PREFIX}doughnut`]: doughnutIcon,
+	};
+
+	maplibregl.addProtocol('pmtiles', new Protocol().tile);
+
+	const map = new maplibregl.Map({
+		container: 'map',
+		style: `https://api.protomaps.com/styles/v5/light/en.json?key=${PROTOMAPS_KEY}`,
+		center: [-93.265, 44.9778],
+		zoom: 11,
+		hash: true,
+	});
+
+	map.addControl(new maplibregl.NavigationControl(), 'top-right');
+	map.addControl(new maplibregl.GeolocateControl({
+		positionOptions: { enableHighAccuracy: true },
+		trackUserLocation: true,
+	}), 'top-right');
+
+	const isBakery = ['==', ['get', 'shop'], 'bakery'];
+
+	map.on('load', async () => {
+		await Promise.all(
+			Object.entries(ICONS).map(async ([name, asset]) => {
+				const img = new Image();
+				img.src = asset.src;
+				await img.decode();
+				map.addImage(name, img);
+			}),
+		);
+
+		map.addSource('bread', {
+			type: 'vector',
+			url: `pmtiles://${BREAD_PMTILES}`,
+			attribution: 'Bread data © <a href="https://openstreetmap.org">OpenStreetMap</a>',
+		});
+
+		// Specific category icons: shop type → icon
+		const otherIconLayers: Array<{ id: string; icon: string; filter: any; minzoom?: number }> = [
+			{ id: 'bread-supermarket', icon: `${ICON_PREFIX}cart`, filter: ['==', ['get', 'shop'], 'supermarket'] },
+			{ id: 'bread-grocery', icon: `${ICON_PREFIX}basket`, filter: ['==', ['get', 'shop'], 'grocery'] },
+			{ id: 'bread-convenience', icon: `${ICON_PREFIX}convenience`, filter: ['==', ['get', 'shop'], 'convenience'], minzoom: 13 },
+			{ id: 'bread-cafe', icon: `${ICON_PREFIX}coffee`, filter: ['==', ['get', 'amenity'], 'cafe'], minzoom: 12 },
+			{ id: 'bread-pastry', icon: `${ICON_PREFIX}croissant`, filter: ['==', ['get', 'shop'], 'pastry'] },
+			{
+				id: 'bread-sandwich',
+				icon: `${ICON_PREFIX}sandwich`,
+				filter: ['any',
+					['==', ['get', 'shop'], 'sandwich'],
+					['==', ['get', 'shop'], 'deli'],
+				],
+			},
+			{
+				id: 'bread-bagel',
+				icon: `${ICON_PREFIX}bagel`,
+				filter: ['any',
+					['==', ['get', 'shop'], 'bagel'],
+					['==', ['get', 'cuisine'], 'bagel'],
+				],
+			},
+			{
+				id: 'bread-doughnut',
+				icon: `${ICON_PREFIX}doughnut`,
+				filter: ['any',
+					['==', ['get', 'shop'], 'donut'],
+					['==', ['get', 'shop'], 'doughnut'],
+					['==', ['get', 'cuisine'], 'donut'],
+					['==', ['get', 'cuisine'], 'doughnut'],
+				],
+			},
+		];
+
+		for (const { id, icon, filter, minzoom = 11 } of otherIconLayers) {
+			map.addLayer({
+				id,
+				type: 'symbol',
+				source: 'bread',
+				'source-layer': 'bread',
+				minzoom,
+				filter,
+				layout: {
+					'icon-image': icon,
+					'icon-size': [
+						'interpolate', ['exponential', 1.5], ['zoom'],
+						11, 0.06,
+						14, 0.16,
+					],
+					'icon-allow-overlap': true,
+					'icon-ignore-placement': true,
+				},
+			});
+		}
+
+		// Bakeries at low zooms: cheap gold dots
+		map.addLayer({
+			id: 'bread-bakery-dot',
+			type: 'circle',
+			source: 'bread',
+			'source-layer': 'bread',
+			maxzoom: 9,
+			filter: isBakery,
+			paint: {
+				'circle-radius': ['interpolate', ['exponential', 1.5], ['zoom'], 0, 2, 8, 5],
+				'circle-color': '#F5B03E',
+				'circle-stroke-color': '#3a2410',
+				'circle-stroke-width': 1,
+			},
+		});
+
+		// Bakeries at high zooms: bread icons (rendered above other categories)
+		map.addLayer({
+			id: 'bread-bakery',
+			type: 'symbol',
+			source: 'bread',
+			'source-layer': 'bread',
+			minzoom: 9,
+			filter: isBakery,
+			layout: {
+				'icon-image': `${ICON_PREFIX}bread`,
+				'icon-size': [
+					'interpolate', ['exponential', 1.5], ['zoom'],
+					9, 0.04,
+					14, 0.22,
+				],
+				'icon-allow-overlap': true,
+				'icon-ignore-placement': true,
+			},
+		});
+
+		// Bakery names — only at z12+ (matches the prepare-tiles cutoff)
+		map.addLayer({
+			id: 'bread-bakery-label',
+			type: 'symbol',
+			source: 'bread',
+			'source-layer': 'bread',
+			minzoom: 12,
+			filter: isBakery,
+			layout: {
+				'text-field': ['get', 'name'],
+				'text-font': ['Noto Sans Regular'],
+				'text-size': 12,
+				'text-anchor': 'center',
+			},
+			paint: {
+				'text-color': '#3a2410',
+				'text-halo-color': '#fff8e7',
+				'text-halo-width': 1.5,
+			},
+		});
+	});
+</script>
