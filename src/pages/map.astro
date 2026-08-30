@@ -94,6 +94,10 @@ import Layout from "../layouts/Layout.astro";
 
     const PROTOMAPS_KEY = "a225972fbf33c056";
     const BREAD_PMTILES = "https://cdn.breadnear.me/bread.pmtiles";
+    const PROTOMAPS_ATTRIBUTION =
+        '<a href="https://protomaps.com" target="_blank" rel="noopener noreferrer">Protomaps</a>';
+    const OPENSTREETMAP_ATTRIBUTION =
+        '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a>';
 
     // Namespaced so our ids can't collide with basemap sprite icons (the protomaps
     // light sprite includes 'coffee', 'convenience_store', etc, and addImage
@@ -119,7 +123,15 @@ import Layout from "../layouts/Layout.astro";
         center: [-95, 42],
         zoom: 4,
         hash: true,
+        attributionControl: false,
     });
+    map.addControl(
+        new maplibregl.AttributionControl({
+            compact: false,
+            customAttribution: PROTOMAPS_ATTRIBUTION,
+        }),
+        "bottom-right",
+    );
     map.addControl(new maplibregl.NavigationControl(), "top-right");
     map.addControl(
         new maplibregl.GeolocateControl({
@@ -144,8 +156,7 @@ import Layout from "../layouts/Layout.astro";
         map.addSource("bread", {
             type: "vector",
             url: `pmtiles://${BREAD_PMTILES}`,
-            attribution:
-                'Bread data © <a href="https://openstreetmap.org">OpenStreetMap</a>',
+            attribution: OPENSTREETMAP_ATTRIBUTION,
         });
 
         // Specific category icons: shop type → icon
